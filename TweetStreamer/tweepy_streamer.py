@@ -1,27 +1,68 @@
+from tweepy import API
+from tweepy import Cursor 
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 
 import twitter_credentials
+import numpy as np
+import pandas as pd
+
+
+class TwitterClient():
+
+	def __init__(self, twitter_user=None):
+		self.auth = TwitterAuthenticator().authenticate_app()
+		self.twitter_client = API(self.auth) #to get the api of the twitter client
+		self.twitter_user = twitter_user
+
+
+	def get_twitter_client_api(self):
+		return self.twitter_client
+	
+	def get_user_timeline_tweets(self, num_tweets):
+		tweets = []
+		for tweet in Cursor(self.twitter_client.user_timeline, id=self.twitter_user).items(num_tweets):
+			tweets.append(tweet)
+		return tweets
+
+	def get_friendlist(self, num_friends):
+		friend_list = []
+		for friend in Cursor(self.twitter_client.friends, id=self.twitter_user).items(num_friends):
+			friend_list.append(friend)
+		return friend_list
+
+	def get_home_timeline_tweets(self, num_tweets):
+		home_timeline_tweets = []
+		for tweet in Cursor(self.twitter_client.home_timeline, id=self.twitter_user).items(num_tweets):
+			home_timeline_tweets.append(tweet)
+		return home_timeline_tweets
+
+
+
+class TwitterAuthenticator():
+
+	def authenticate_app(self):
+		auth = OAuthHandler(twitter_credentials.CONSUMER_KEY, twitter_credentials.CONSUMER_SECRET) #object of class OAuthHandler - properly authenticate our code
+		auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
+		return auth
 
 class TweetStreamer():
 
+	def __init__(self):
+		self.twitter_authenticator = TwitterAuthenticator()
+
 	def stream_tweets(self, fetched_tweets_filename, keyword_list):
 		
-		listener = StdOutListener(fetched_tweets_filename)
-		auth = OAuthHandler(twitter_credentials.CONSUMER_KEY, twitter_credentials.CONSUMER_SECRET) #object of class OAuthHandler - properly authenticate our code
-		auth.set_access_token(twitter_credentials.ACCESS_TOKEN, twitter_credentials.ACCESS_TOKEN_SECRET)
-	
+		listener = TweetListener(fetched_tweets_filename)
+		auth = self.twitter_authenticator.authenticate_app()
 		stream = Stream(auth, listener) 
-		#stream- object of class Stream
-		#listener- object which specifies how do I deal with the data and how do I deal with the errors
-	
-		#filter the tweets based on a list of keywords = track
+		
 		stream.filter(track=keyword_list)
 
 
-#class to print tweets
-class StdOutListener(StreamListener): #INHERIT FROM STREAMLISTENER CLASS
+#class to print recieved tweets to stdout
+class TweetListener(StreamListener): #INHERIT FROM STREAMLISTENER CLASS
 	
 	def __init__(self,fetched_tweets_filename):
 		self.fetched_tweets_filename = fetched_tweets_filename
@@ -37,15 +78,29 @@ class StdOutListener(StreamListener): #INHERIT FROM STREAMLISTENER CLASS
 		return True
 
 	def on_error(self, status):
-	   print(status) #status-variable containg actual error
+	   if status == 420:
+		return False  #Returning false on data method incase rate limit exceeded
+	   print(status) 
+
+
+class TweetAnalyzer():
+	'''
+	For analyzing and categorizing content from tweets
+	'''
+	pass
 
 
 if __name__ == '__main__':
 
-	keyword_list = ["narendra modi", "rajiv gandhi", "youtube"]
-	fetched_tweets_filename = "tweets.json"
+	# keyword_list = ["narendra modi", "rajiv gandhi", "youtube"]
+	# fetched_tweets_filename = "tweets.json"
 
-	tweet_streamer = TweetStreamer()
-	tweet_streamer.stream_tweets(fetched_tweets_filename, keyword_list)    
+	# twitter_client = TwitterClient('youtube');
+	# print(twitter_client.get_user_timeline_tweets(1))
+ #    print(twitter_client.get_friendlist(5))
 	
-	
+	twitter_client = TwitterClient()
+	api = twitter_client.get_twitter_client_api()
+	tweets = api.user_timeline(screen_name="realDonaldTrump", count=20)
+
+	print(tweets)
