@@ -29,7 +29,7 @@ class TwitterClient():
 		friend_list = []
 		for friend in Cursor(self.twitter_client.friends, id=self.twitter_user).items(num_friends):
 			friend_list.append(friend)
-		return friend_list
+		return friend_listpy
 
 	def get_home_timeline_tweets(self, num_tweets):
 		home_timeline_tweets = []
@@ -102,13 +102,6 @@ class TweetAnalyzer():
 
 if __name__ == '__main__':
 
-	# keyword_list = ["narendra modi", "rajiv gandhi", "youtube"]
-	# fetched_tweets_filename = "tweets.json"
-
-	# twitter_client = TwitterClient('youtube');
-	# print(twitter_client.get_user_timeline_tweets(1))
- #    print(twitter_client.get_friendlist(5))
-	
 	twitter_client = TwitterClient()
 	tweet_analyzer = TweetAnalyzer()
 	api = twitter_client.get_twitter_client_api()
