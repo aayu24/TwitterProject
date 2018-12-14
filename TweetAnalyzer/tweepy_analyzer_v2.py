@@ -112,12 +112,6 @@ if __name__ == '__main__':
 	
 	df=tweet_analyzer.tweets_to_dataframe(tweets)
 	
-	#Get average length over all tweets
-	print(np.mean(df['len']))
-
-	#Get the no of likes for the most liked tweet
-	print(np.max(df['likes']))
-	
 	#TIME SERIES PLOT
 	# time_likes = pd.Series(data=df['likes'].values, index=df['date']) #index -x axis
 	# time_likes.plot(figsize=(16,4), color='b') #create the plot
