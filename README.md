@@ -1,5 +1,5 @@
 # TwitterProject
-Performing Sentiment Analysis of tweets through Python and twitter API
+Performing Sentiment Analysis of tweets through Python and twitter API, using tweepy
 
 ## Python Version and Modules Required
 Python 2.7.15
