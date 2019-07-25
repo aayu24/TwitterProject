@@ -1,4 +1,4 @@
-# TwitterProject
+# Moody Tweets
 Performing Sentiment Analysis of tweets through Python and twitter API, using tweepy
 
 ## Python Version and Modules Required
